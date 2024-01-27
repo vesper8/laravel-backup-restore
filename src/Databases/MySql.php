@@ -48,14 +48,17 @@ class MySql extends DbImporter
         $quote = $this->determineQuote();
         $password = $credentials['password'];
 
+        $gunzip = config('backup-restore.binaries.gunzip', '/usr/bin/gunzip');
+        $mysql = config('backup-restore.binaries.mysql', '/opt/homebrew/bin/mysql');
+
         return collect([
-            "gunzip < {$storagePathToDatabaseFile}",
+            "{$gunzip} < {$storagePathToDatabaseFile}",
             '|',
-            "{$quote}{$this->dumpBinaryPath}mysql{$quote}",
+            "{$quote}{$this->dumpBinaryPath}{$mysql}{$quote}",
             '-u', $credentials['user'],
             ! empty($password) ? "{$quote}-p'{$password}'{$quote}" : '',
             '-P', $credentials['port'],
-            isset($credentials['host']) ? '-h '.$credentials['host'] : '',
+            isset($credentials['host']) ? '-h ' . $credentials['host'] : '',
             $importToDatabase,
         ])->filter()->implode(' ');
     }
