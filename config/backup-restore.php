@@ -15,4 +15,10 @@ return [
     'health-checks' => [
         \Wnx\LaravelBackupRestore\HealthChecks\Checks\DatabaseHasTables::class,
     ],
+
+    'binaries' => [
+        'mysql' => '/opt/homebrew/bin/mysql',
+        'mysqldump' => '/opt/homebrew/bin/mysqldump',
+        'gunzip' => '/usr/bin/gunzip',
+    ],    
 ];
