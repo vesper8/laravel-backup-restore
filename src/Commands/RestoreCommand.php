@@ -39,7 +39,8 @@ class RestoreCommand extends Command
                         {--backup= : The backup to restore. Defaults to the latest backup.}
                         {--connection= : The database connection to restore the backup to. Defaults to the first connection in config/backup.php.}
                         {--password= : The password to decrypt the backup.}
-                        {--reset : Drop all tables in the database before restoring the backup.}';
+                        {--reset : Drop all tables in the database before restoring the backup.}
+                        {--format= : The format to use when listing backups.}';
 
     public $description = 'Restore a database backup dump from a given disk to a database connection.';
 
@@ -62,6 +63,16 @@ class RestoreCommand extends Command
         Prompt::fallbackWhen(
             ! $this->input->isInteractive() || windows_os() || app()->runningUnitTests()
         );
+
+        // Check if the format option is set to json and output the backups in json format
+        if ($this->option('format') === 'json') {
+            $disk = $this->getDestinationDiskToRestoreFrom();
+            $listOfBackups = $this->getBackupList($disk);
+
+            $this->output->writeln(json_encode($listOfBackups));
+
+            return self::SUCCESS;
+        }        
 
         $connection = $this->option('connection') ?? config('backup.backup.source.databases')[0];
 
