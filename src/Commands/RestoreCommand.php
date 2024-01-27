@@ -107,6 +107,27 @@ class RestoreCommand extends Command
         return $this->runHealthChecks($pendingRestore);
     }
 
+    /**
+     * Get the list of backups in an array.
+     *
+     * @param string $disk
+     * @return array
+     * @throws NoBackupsFound
+     */
+    private function getBackupList(string $disk): array
+    {
+        $name = config('backup.backup.name');
+
+        $listOfBackups = collect(Storage::disk($disk)->allFiles($name))
+            ->filter(fn ($file) => Str::endsWith($file, '.zip'));
+
+        if ($listOfBackups->isEmpty()) {
+            throw NoBackupsFound::onDisk($disk);
+        }
+
+        return $listOfBackups->toArray();
+    }
+
     private function getDestinationDiskToRestoreFrom(): string
     {
         // Use disk from --disk option if provided
